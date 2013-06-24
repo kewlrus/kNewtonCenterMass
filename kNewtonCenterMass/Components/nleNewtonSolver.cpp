@@ -8,21 +8,23 @@ int SortCompare(const void* a, const void* b)
 nleNewtonSolver::nleNewtonSolver(short int centers_count)
 {
 	this->centers_count = centers_count;
+	x0 = boost::shared_array<float>(new float[centers_count]);
+	y0 = boost::shared_array<float>(new float[centers_count]);
+	z0 = boost::shared_array<float>(new float[centers_count]);
+	r = boost::shared_array<float>(new float[centers_count]);
 
-	x0 = new float[centers_count];
-	y0 = new float[centers_count];
-	z0 = new float[centers_count];
-	fpi = new float[centers_count];
-	wpi = new float*[centers_count];
-	for (int i = 0; i < centers_count; i++)
-		wpi[i] = new float[centers_count];
+	fpi = boost::shared_array<float>(new float[centers_count]);
 
-	w_1pi = new float*[centers_count];
+	wpi = boost::shared_array<boost::shared_array<float>>(new boost::shared_array<float>[centers_count]);
 	for (int i = 0; i < centers_count; i++)
-		w_1pi[i] = new float[centers_count];
-	r = new float[centers_count];
+		wpi[i] = boost::shared_array<float>(new float[centers_count]);
+
+	w_1pi = boost::shared_array<boost::shared_array<float>>(new boost::shared_array<float>[centers_count]);
+	for (int i = 0; i < centers_count; i++)
+		w_1pi[i] = boost::shared_array<float>(new float[centers_count]);
+
 	real_centers_count = 0;
-	ADop = NULL;
+
 	Mul = NULL;
 
 	old_pi = new nleStructures::point();
@@ -33,25 +35,6 @@ nleNewtonSolver::~nleNewtonSolver(void)
 {
 	delete old_pi;
 	delete buff_pi;
-
-	delete [] x0;
-	delete [] y0;
-	delete [] z0;
-	delete [] fpi;
-
-	for (int i = 0; i < centers_count; i++)
-		delete [] wpi[i];
-	delete [] wpi;
-
-	for (int i = 0; i < centers_count; i++)
-		delete [] w_1pi[i];
-	delete [] w_1pi;
-
-	for (int i = 0; i < real_centers_count - 1; i++)
-		delete [] ADop[i];
-	delete [] ADop;
-
-	delete [] r;
 }
 
 nleStructures::point* nleNewtonSolver::GetPoint(nleStructures::SensorData* SensorData, short int SensorsCount, int Width, int Height)
@@ -287,7 +270,7 @@ void nleNewtonSolver::WPiCalc(nleStructures::point *pi)
 	}
 }
 
-float nleNewtonSolver::determinant(float** wpi, short int razm)
+float nleNewtonSolver::determinant(boost::shared_array<boost::shared_array<float>> wpi, short int razm)
 {
 	float det  =  0.0f;
 	if (razm == 3)
@@ -306,10 +289,9 @@ float nleNewtonSolver::determinant(float** wpi, short int razm)
 			-wpi[0][1] * wpi[1][0];
 		else
 		{
-			float** ADop = new float * [razm-1];
-
-			for (int i = 0; i < razm - 1; i++)
-				ADop[i] = new float[razm - 1];
+			ADop = boost::shared_array<boost::shared_array<float>>(new boost::shared_array<float>[razm - 1]);
+			for (int i = 0; i < centers_count; i++)
+				ADop[i] = boost::shared_array<float>(new float[razm - 1]);
 
 			int id, jd = 0;
 			bool flag = false;
@@ -339,24 +321,19 @@ float nleNewtonSolver::determinant(float** wpi, short int razm)
 
 				det += mul * wpi[i][j] * determinant(ADop, razm - 1);
 			}
-			for (int i = 0; i < razm - 1; i++)
-				delete [] ADop[i];
-
-			delete [] ADop;
 		}
 	}
 	return det;
 }
 
 
-void nleNewtonSolver::W_1PiCalc(float** wpi, float det)
+void nleNewtonSolver::W_1PiCalc(boost::shared_array<boost::shared_array<float>> wpi, float det)
 {
 	if (ADop == NULL)
 	{
-		ADop = new float*[real_centers_count - 1];
-
+		ADop = boost::shared_array<boost::shared_array<float>>(new boost::shared_array<float>[real_centers_count - 1]);
 		for (int i = 0; i < real_centers_count - 1; i++)
-			ADop[i] = new float[real_centers_count - 1];
+			ADop[i] = boost::shared_array<float>(new float[real_centers_count - 1]);
 	}
 		
 	bool flag = false;
@@ -391,7 +368,7 @@ void nleNewtonSolver::W_1PiCalc(float** wpi, float det)
 	}
 }
 
-void nleNewtonSolver::MulMatrix(float** w_1pi,float* fpi, nleStructures::point* pi)
+void nleNewtonSolver::MulMatrix(boost::shared_array<boost::shared_array<float>> w_1pi, boost::shared_array<float> fpi, nleStructures::point* pi)
 {
 	if (Mul == NULL)
 		Mul = new float[real_centers_count];

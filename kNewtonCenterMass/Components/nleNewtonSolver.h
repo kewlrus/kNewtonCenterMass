@@ -111,7 +111,7 @@ namespace nleStructures
 	struct Results
 	{
 		private:
-			vector <nleStructures::Result_items> *ResultItems;
+			vector <nleStructures::Result_items>* ResultItems;
 
 		public:
 			vector<nleStructures::Result_items>* GetResults()
@@ -155,7 +155,7 @@ public:
 	void ClearXY();
 	nleStructures::point* FPiCalc(nleStructures::point* pi, bool modify, float post_dmg_area, float mdx);
 	
-	vector<nleStructures::Result_items> * GetResults(void) {return Results.GetResults(); };
+	vector<nleStructures::Result_items>* GetResults(void) {return Results.GetResults(); };
 
 	nleNewtonSolver(short int centers_count);
 	virtual ~nleNewtonSolver(void);
@@ -170,9 +170,12 @@ private:
 	float	MassComputeXChisl;
 	float	MassComputeYChisl;
 
-	float* x0, *y0, *z0, *r;
-	float* fpi, ** wpi, **w_1pi;
-	float** ADop;
+	boost::shared_array<float> x0, y0, z0, r, fpi;
+
+	boost::shared_array<boost::shared_array<float>> wpi;
+	boost::shared_array<boost::shared_array<float>> w_1pi;
+	boost::shared_array<boost::shared_array<float>> ADop;
+
 	float* Mul;
 
 	nleStructures::point* old_pi;
@@ -182,9 +185,9 @@ private:
 	short int centers_count;
 	
 	void WPiCalc(nleStructures::point* pi);
-	void W_1PiCalc(float** wpi, float det);
-	void MulMatrix(float** w_1pi, float* fpi, nleStructures::point* pi);
-	float determinant(float** wpi, short int razm);
+	void W_1PiCalc(boost::shared_array<boost::shared_array<float>> wpi, float det);
+	void MulMatrix(boost::shared_array<boost::shared_array<float>> w_1pi, boost::shared_array<float> fpi, nleStructures::point* pi);
+	float determinant(boost::shared_array<boost::shared_array<float>> wpi, short int razm);
 	float function(float x, float x0, float y, float y0, float r);
 
 	float df0dx(float x, float x0);

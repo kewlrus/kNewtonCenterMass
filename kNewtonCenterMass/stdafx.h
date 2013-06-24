@@ -15,6 +15,9 @@
 #include <conio.h>
 
 #include <vector>
+#include <memory>
+#include <boost/shared_array.hpp>
+#include <boost/scoped_array.hpp>
 using namespace std;
 
 #include "Components\\nleNewtonSolver.h"

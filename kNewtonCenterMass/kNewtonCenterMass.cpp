@@ -25,7 +25,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	nleNewtonSolver NonLinerEquationsSolver(4);
 
-	nleStructures::point* res = NonLinerEquationsSolver.GetPoint(SensorData, SensorsCount, 1500, 750);
+	std::auto_ptr<nleStructures::point> res(NonLinerEquationsSolver.GetPoint(SensorData, SensorsCount, 1500, 750));
 	printf("Result: (%0.2f, %0.2f)\n", res->x, res->y);
 	vector <nleStructures::Result_items>* Results = NonLinerEquationsSolver.GetResults();
 
@@ -40,22 +40,21 @@ int _tmain(int argc, _TCHAR* argv[])
 		, Results->at(i).SensorsTriggered.SensorsNums[2]
 		);
 	}
+	
+	SensorData[2].Y = 1000.0f;
+	res.reset(NonLinerEquationsSolver.GetPoint(SensorData, SensorsCount, 2000, 1500));
+	printf("Result: (%0.2f, %0.2f)\n", res->x, res->y);
+
+	SensorData[2].Y = 1200.0f;
+	res.reset(NonLinerEquationsSolver.GetPoint(SensorData, SensorsCount, 2000, 1500));
+	printf("Result: (%0.2f, %0.2f)\n", res->x, res->y);
+
+	SensorData[2].Y = 1400.0f;
+	res.reset(NonLinerEquationsSolver.GetPoint(SensorData, SensorsCount, 2000, 1500));
+	printf("Result: (%0.2f, %0.2f)\n", res->x, res->y);
 
 	delete Results;
-	delete res;
-	/*
-	SensorData[2].Y = 1000.0f;
-	res = NonLinerEquationsSolver.GetPoint(SensorData, SensorsCount, 2000, 1500);
-	printf("Result: (%0.2f, %0.2f)\n", res->x, res->y);
 
-	delete res;
-	res = NonLinerEquationsSolver.GetPoint(SensorData, SensorsCount, 2000, 1500);
-	printf("Result: (%0.2f, %0.2f)\n", res->x, res->y);
-
-	delete res;
-	res = NonLinerEquationsSolver.GetPoint(SensorData, SensorsCount, 2000, 1500);
-	printf("Result: (%0.2f, %0.2f)\n", res->x, res->y);
-*/
 	_getch();
 
 	return 0;
