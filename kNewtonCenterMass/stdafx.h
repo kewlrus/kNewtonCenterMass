@@ -20,6 +20,7 @@
 #include <boost/scoped_array.hpp>
 using namespace std;
 
+#include "nleNewtonSolverInterface.h"
 #include "Components\\nleNewtonSolver.h"
 
 // TODO. Установите здесь ссылки на дополнительные заголовки, требующиеся для программы
