@@ -29,7 +29,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	printf("Result: (%0.2f, %0.2f)\n", res->x, res->y);
 	vector <nleStructures::Result_items>* Results = NonLinerEquationsSolver.GetResults();
 
-	for (int i = 0; i < Results->size(); i++)
+	for (vector<char*>::size_type i = 0; i < Results->size(); i++)
 	{
 		printf("%0.2f, %0.2f, %0.2f .. , %d, %d, %d\n"
 		, Results->at(i).Coords.x
